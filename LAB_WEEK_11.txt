@@ -1,0 +1,59 @@
+. takePictureLauncher =
+       registerForActivityResult(ActivityResultContracts.TakePicture()) {
+           providerFileManager.insertImageToStore(photoInfo)
+       }
+
+   ....
+   takePictureLauncher.launch(photoInfo?.uri)
+   ....
+
+2. Atribut URI isinya adalah sebuah URI yang dibuat oleh FileProvider. Gunanya adalah untuk menyimpan media ke dalam storage pribadi aplikasi. URI bersifat temporary, dan hanya untuk memberi akses penggunaan kamera kepada aplikasi untuk menyimpan media.
+
+   Atribut relativePath adalah untuk menyimpan alamat folder dimana media akan di-store.
+
+3. [1] User menekan button
+
+   findViewById<Button>(R.id.photo_button).setOnClickListener {...}
+   findViewById<Button>(R.id.video_button).setOnClickListener {...}
+
+   [2] Cek permission
+
+   checkStoragePermission {openImageCapture()}
+   checkStoragePermission {openVideoCapture()}
+
+   [3] Siapkan URI
+
+   photoInfo = providerFileManager.generatePhotoUri(System.currentTimeMillis())
+   videoInfo = providerFileManager.generateVideoUri(System.currentTimeMillis())
+
+   [4] Launch aplikasi kamera dengan menggunakan URI
+
+   takePictureLauncher.launch(photoInfo?.uri!!)
+   takeVideoLauncher.launch(videoInfo?.uri!!)
+
+   [5] User menangkap gambar/video menggunakan aplikasi kamera, lalu disimpan ke URI
+
+   [6] Callback
+
+   ActivityResultContracts.TakePicture() {
+       providerFileManager.insertImageToStore(photoInfo)
+   }
+   ActivityResultContracts.CaptureVideo() {
+       providerFileManager.insertVideoToStore(videoInfo)
+   }
+
+   [7] Aplikasi akan menyimpan media ke dalam MediaStore
+
+   insertToStore(
+      fileInfo,
+      mediaContentHelper.getImageContentUri(),
+      mediaContentHelper.generateImageContentValues(it)
+   )
+
+   insertToStore(
+      fileInfo,
+      mediaContentHelper.getVideoContentUri(),
+      mediaContentHelper.generateVideoContentValues(it)
+   )
+
+   [8] Media sekarang muncul di gallery
